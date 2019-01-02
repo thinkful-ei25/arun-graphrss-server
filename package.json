@@ -1,0 +1,7 @@
+{
+  "name": "graph-rss-server",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "author": "Arun Seehra <seehra.a@gmail.com>",
+  "license": "ISC"
+}
