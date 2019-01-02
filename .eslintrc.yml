@@ -1,0 +1,14 @@
+extends: airbnb-base
+
+parserOptions:
+  sourceType: script
+
+rules:
+  max-len:
+    - warn
+    - code: 88
+
+overrides:
+  - files: ['*.test.js']
+    env:
+      jest: true
