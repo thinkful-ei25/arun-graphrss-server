@@ -1,5 +1,6 @@
 'use strict';
 
+const Promise = require('bluebird');
 const rssParser = require('../rssparser');
 
 const { Model } = require('../bookshelf');
@@ -39,7 +40,6 @@ const Mutation = {
         if (e.code === '23505') {
           throw new Error('Feed already exists');
         }
-
         throw e;
       });
   },
@@ -53,6 +53,46 @@ const Mutation = {
     })
     .then(() => Feed.collection().fetch())
     .then(feeds => feeds.serialize()),
+
+  refresh: () => {
+    let feeds;
+    return Feed.collection()
+      .fetch()
+      .then((_feeds) => {
+        feeds = _feeds;
+        return Promise.all(feeds.map(feed => rssParser.get(feed.get('url'))));
+      })
+      .then((rssData) => {
+        const articleCollection = rssData.reduce((acc, feedData, feedIndex) => {
+          const articles = feedData.articles.map(
+            ({
+              title, link: url, summary, description, guid,
+            }) => ({
+              title,
+              url,
+              summary,
+              description,
+              guid,
+              feed_id: feeds.at(feedIndex).get('id'),
+            }),
+          );
+          return acc.add(articles);
+        }, Article.collection());
+
+        return Promise.all(
+          articleCollection.map(article => article.save().catch((e) => {
+            if (e.code === '23505') {
+              return article.fetch();
+            }
+            throw e;
+          })),
+        );
+      })
+      .then(articles => articles
+        .reduce((acc, article) => acc.add(article), Article.collection())
+        .load('feed'))
+      .then(articles => articles.serialize());
+  },
 };
 
 module.exports = Mutation;
