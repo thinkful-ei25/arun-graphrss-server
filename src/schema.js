@@ -11,6 +11,7 @@ module.exports = gql`
   type Mutation {
     addFeed(url: String!): Feed!
     removeFeed(id: ID!): [Feed]
+    refresh: [Article]!
   }
 
   type Feed {

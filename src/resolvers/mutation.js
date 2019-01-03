@@ -17,21 +17,22 @@ const Mutation = {
       })
       .then((_feed) => {
         feed = _feed;
-        return Promise.all(
-          articles.map((article) => {
-            const {
-              title, link, summary, guid, description,
-            } = article;
-            return new Article({
-              title,
-              url: link,
-              summary,
-              description,
-              guid,
-              feed_id: feed.id,
-            }).save();
+        const articleModels = articles.map(
+          ({
+            title, link, summary, description, guid,
+          }) => ({
+            title,
+            url: link,
+            summary,
+            description,
+            guid,
+            feed_id: feed.id,
           }),
         );
+
+        return Article.collection()
+          .add(articleModels)
+          .invokeThen('save');
       })
       .then(() => feed.serialize())
       .catch((e) => {
