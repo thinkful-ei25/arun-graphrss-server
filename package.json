@@ -5,7 +5,8 @@
   "author": "Arun Seehra <seehra.a@gmail.com>",
   "license": "ISC",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "node src/index.js",
+    "watch": "nodemon src/index.js"
   },
   "dependencies": {
     "apollo-server": "^2.3.1",
