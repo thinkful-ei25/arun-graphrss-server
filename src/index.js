@@ -12,5 +12,7 @@ const server = new ApolloServer({
 
 /* eslint-disable no-console */
 if (require.main === module) {
-  server.listen({ port: 4000 }).then(({ url }) => console.log(`🚀 ${url}`));
+  server
+    .listen({ port: process.env.PORT || 4000 })
+    .then(({ url }) => console.log(`🚀 ${url}`));
 }
